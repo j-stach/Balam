@@ -35,11 +35,21 @@ fn one_dense_layer() {
 
 }
 
-/// Dot product for f32 vecs
-trait Dot {
-    fn dot_product(&self, rhs: &Vec<f32>) -> f32;
+/// Trims away negative values for ReLU activation
+fn take_pos(val: f32) -> f32 {
+    let mut val = val;
+    if val < 0. { val = 0.; }
+    return val
 }
-impl Dot for Vec<f32> {
+
+/// Math functions for f32 vecs
+// include take_pos when moving to new mod
+trait MathUtils {
+    fn dot_product(&self, rhs: &Vec<f32>) -> f32;
+    fn sum(&self) -> f32;
+}
+impl MathUtils for Vec<f32> {
+    /// Dot product of two vectors of f32
     fn dot_product(&self, rhs: &Vec<f32>) -> f32 {
         assert_eq![self.len(), rhs.len()];
         let mut product: f32 = 0.;
@@ -48,13 +58,20 @@ impl Dot for Vec<f32> {
         }
         return product
     }
+    /// Add together all elements of a vector of f32
+    fn sum(&self) -> f32 {
+        let mut sum: f32 = 0.;
+        for f in self { sum += f };
+        return sum
+    }
 }
 
-
+/// "Neuron" node
 struct Node {
     weights: Vec<f32>,
     bias: f32,
 }
+/// Basic layer of neural nodes
 // Eventually, make this an enum?
 struct DenseLayer (Vec<Node>);
 impl DenseLayer {
@@ -75,7 +92,6 @@ impl DenseLayer {
     }
 
     /// Forward pass of batches of inputs through a layer of weights
-    // Functionally replaces matrix product -- no transform or reformatting needed
     fn forward(&self, input_batch: &Vec<Vec<f32>>) -> Vec<Vec<f32>> {
         let weight_set: Vec<Vec<f32>> = self.0.iter().map(|n| n.weights.clone()).collect::<Vec<Vec<f32>>>();
         let biases: Vec<f32> = self.0.iter().map(|n| n.bias.clone()).collect::<Vec<f32>>();
@@ -93,15 +109,16 @@ impl DenseLayer {
     }
 }
 
+/// Activation patterns
 // split these off to an "activation function" crate
-// they operate on the vectors of outputs and simply modify the output collection, instead of creating a whole new set
 trait Activation {
-    fn relu(self) -> Vec<Vec<f32>>;
-    //fn softmax(&mut self) {}
-    //fn linear(&mut self) {}
+    fn relu(&self) -> Vec<Vec<f32>>;
+    fn softmax(&self) -> Vec<Vec<f32>>;
+    //fn linear(&self) -> Vec<Vec<f32>> {}
 }
 impl Activation for Vec<Vec<f32>> {
-    fn relu(self) -> Vec<Vec<f32>> {
+    /// Rectified linear activation pattern, for hidden layers
+    fn relu(&self) -> Vec<Vec<f32>> {
         self.iter()
             .map(|os| { 
                 os.iter()
@@ -110,11 +127,26 @@ impl Activation for Vec<Vec<f32>> {
                   }).collect::<Vec<f32>>()
             }).collect::<Vec<Vec<f32>>>()
     }
-}
+    /// Softmax exponential activation function, for the output layer in classification models
+    fn softmax(&self) -> Vec<Vec<f32>> {
+        let e: f32 = 2.718282;
+        let output_sum: f32 = self.iter()
+                                  .map(|os| { 
+                                      os.iter()
+                                        .map(|o| {
+                                            e ** o
+                                        }).collect::<Vec<f32>>().sum()
+                                  }).collect::<Vec<f32>>().sum();
 
-fn take_pos(val: f32) -> f32 {
-    let mut val = val;
-    if val < 0. { val = 0.; }
-    return val
+        let outputs: Vec<Vec<f32>> = self.iter()
+                                         .map(|os| { 
+                                             os.iter()
+                                               .map(|o| {
+                                                   (e ** o) / output_sum
+                                               }).collect::<Vec<f32>>()
+                                         }).collect::<Vec<Vec<f32>>>();
+        return outputs
+
+    }
 }
 
