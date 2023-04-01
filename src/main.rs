@@ -39,10 +39,18 @@ fn two_dense_layer() {
     }
 
     let layer0_outputs: Vec<Vec<f32>> = layer0.forward(&sample_batch);
-    let layer1_outputs: Vec<usize> = layer1.classify(&layer0_outputs);
+    let layer1_outputs: Vec<Vec<f32>> = layer1.predict(&layer0_outputs);
 
     println!("Outputs:");
-    for output in layer1_outputs { println!("{output} ") };
+    for outputs in &layer1_outputs { 
+        for output in outputs { print!("{output} ") };
+        print!("\n");
+    };
+
+    let class = layer1_outputs.classify();
+
+    println!("Class:");
+    for result in &class { println!("{result} ") };
 }
 
 /// Trims away negative values for ReLU activation
@@ -83,6 +91,18 @@ impl MathUtils for Vec<f32> {
                          .max_by(|(_, x), (_, y)| x.partial_cmp(y).unwrap())
                          .map(|(i, _)| i).unwrap();
         return argmax
+    }
+}
+
+trait Output {
+    fn classify(&self) -> Vec<usize>;
+    //fn cce_loss() -> 
+}
+impl Output for Vec<Vec<f32>> {
+    /// Determines a result from a probability distribution
+    fn classify(&self) -> Vec<usize> {
+        let classification = self.iter().map(|s| s.argmax()).collect::<Vec<usize>>();
+        return classification
     }
 }
 
@@ -127,8 +147,8 @@ impl DenseLayer {
         let product = product.relu();
         return product
     }
-    /// Forward pass of batches of inputs through a layer of weights
-    fn classify(&self, input_batch: &Vec<Vec<f32>>) -> Vec<usize> {
+    /// Output pass that returns a probability distribution 
+    fn predict(&self, input_batch: &Vec<Vec<f32>>) -> Vec<Vec<f32>> {
         let weight_set: Vec<Vec<f32>> = self.0.iter().map(|n| n.weights.clone()).collect::<Vec<Vec<f32>>>();
         let biases: Vec<f32> = self.0.iter().map(|n| n.bias.clone()).collect::<Vec<f32>>();
         assert_eq![input_batch[0].len(), weight_set[0].len()];
@@ -141,10 +161,15 @@ impl DenseLayer {
             product.push(sample);
         }
         let product = product.softmax();
-        let classification = product.iter().map(|s| s.argmax()).collect::<Vec<usize>>();
-        return classification
+        return product
     }
-}
+}    
+
+
+
+
+
+
 
 /// Activation patterns
 // split these off to an "activation function" crate
