@@ -70,7 +70,9 @@ fn cat_loss(outputs: &Vec<Vec<f32>>, targets: Vec<usize>) -> Vec<f32> {
     // Finally, get the natural log of the f32 value at that location
     let mut losses: Vec<f32> = Vec::with_capacity(targets.len());
     for (c, class) in targets.iter().enumerate() {
-        losses.push(outputs[c][*class].ln());
+        let mut output = outputs[c][*class];
+        if output == 0. { output = 0.000000001 };
+        losses.push(-output.ln());
     }
     return losses
 }
