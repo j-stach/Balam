@@ -52,22 +52,20 @@ fn two_dense_layer() {
         print!("\n");
     };
 
-    let classes = &layer1_outputs.classify();
+    let predictions = &layer1_outputs.classify();
     println!("Classes:");
-    for result in classes { println!("{result} ") };
+    for result in predictions { println!("{result} ") };
 
-    let losses = cat_loss(&layer1_outputs, targets);
+    let losses = cat_loss(&layer1_outputs, &targets);
     println!("Losses:");
     for loss in losses { println!("{loss} ") };
+
+    let accuracy = accuracy(predictions, &targets);
+    println!("Accuracy = {accuracy}");
 }
 
 /// Categorical cross-entropy loss calculation
-// After classification of output, compare the target to the output
-// Then run log loss on the f32 value at the target index to determine inaccuracy
-fn cat_loss(outputs: &Vec<Vec<f32>>, targets: Vec<usize>) -> Vec<f32> {
-    // For each in target class, get the usize and the index, 
-    // Then use the index to id the output set, then the usize to get the correct index of outputs
-    // Finally, get the natural log of the f32 value at that location
+fn cat_loss(outputs: &Vec<Vec<f32>>, targets: &Vec<usize>) -> Vec<f32> {
     let mut losses: Vec<f32> = Vec::with_capacity(targets.len());
     for (c, class) in targets.iter().enumerate() {
         let mut output = outputs[c][*class];
@@ -77,7 +75,17 @@ fn cat_loss(outputs: &Vec<Vec<f32>>, targets: Vec<usize>) -> Vec<f32> {
     return losses
 }
 
-
+/// Calculate batch accuracy
+fn accuracy(predictions: &Vec<usize>, targets: &Vec<usize>) -> f32 {
+    assert_eq![predictions.len(), targets.len()];
+    let mut misses: usize = 0;
+    let comparison = predictions.iter().zip(targets.iter());
+    for (p, t) in comparison {
+        if p != t { misses += 1 }
+    }
+    let accuracy: f32 = (predictions.len() as f32 - misses as f32) / targets.len() as f32;
+    return accuracy
+}
 
 
 
