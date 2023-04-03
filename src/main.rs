@@ -88,5 +88,3 @@ fn accuracy(predictions: &Vec<usize>, targets: &Vec<usize>) -> f32 {
 }
 
 
-
-
