@@ -12,7 +12,7 @@ pub struct Node {
 
 /// Basic layer of neural nodes
 // Eventually, make this an enum?
-pub struct DenseLayer (pub Vec<Node>);
+pub struct DenseLayer(pub Vec<Node>);
 impl DenseLayer {
     /// Create a new layer of fully connected nodes
     pub fn new(input_count: usize, node_count: usize) -> Self {
