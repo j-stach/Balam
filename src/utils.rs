@@ -6,7 +6,6 @@ pub fn take_pos(val: f32) -> f32 {
 }
 
 /// Math functions for f32 vecs
-// include take_pos when moving to new mod
 pub trait MathUtils {
     fn dot_product(&self, rhs: &Vec<f32>) -> f32;
     fn sum(&self) -> f32;
