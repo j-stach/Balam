@@ -1,7 +1,6 @@
 use crate::utils::*;
 
 /// Activation patterns
-// split these off to an "activation function" crate
 pub trait Activation {
     fn relu(&self) -> Vec<Vec<f32>>;
     fn softmax(&self) -> Vec<Vec<f32>>;
