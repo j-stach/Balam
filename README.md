@@ -8,7 +8,7 @@ The purpose of Oiler is to create an algorithm for generating machine learning "
 
 It will do this in a series of steps using a variety of languages. <br>
 (It's not necessary or even necessarily performant to involve multiple languages but I figure it could spice things up) <br>
-- First, create a Rust struct modeling the polygon to be considered as a vector of tuples describing the figure's vertex positions. <br>
+- First, create a Rust struct modeling a polygon as a vector of tuples describing the figure's vertex positions. <br>
 - Next, use a symbolic math-oriented language such as MATLAB or APL to recall a universal formula for the calculation to be learned (for example, Gauss's Shoelace formula for area, or the sum of side lengths for the perimeter, etc.) and create a dimensional profile for the hidden layers of the ML model based on the number and types of operations required by the equation for the given polygon, and pass this profile back to a Rust function to generate the neural net. <br>
 - Then, involve a data-oriented language such as R or Python to procedurally generate a continuous dataset (complete with expected output) and use this dataset to train the model. <br>
 - Finally, once the model has reached a sufficient threshold for accuracy, cease training and begin testing using the same method of procedural generation. If the accuracy of the model is proven through testing, it can be exported from Rust as a JSON file. <br>
