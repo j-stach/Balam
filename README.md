@@ -1,6 +1,8 @@
 # Oiler (WIP)
 (Pronounced "Euler") <br>
-Automated Machine Learning model generator, trainer/tuner, and tester.
+Automated Machine Learning model generator, trainer/tuner, and tester. <br>
+A play on words based on the name of the famous mathematician, and the process for maintaining and improving the efficiency of a machine.
+<br> <br>
 
 This project currently follows the machine learning model outlined in _Neural Networks from Scratch in Python_, by Kinsley and Kukiela, but in Rust.
 
